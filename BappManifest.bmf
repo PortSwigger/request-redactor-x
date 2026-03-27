@@ -1,0 +1,13 @@
+Uuid: a26e2cd0dc1a4fb89010e46d3924b5a4
+ExtensionType: 2
+Name: Request Redactor X
+RepoName: request-redactor-x
+ScreenVersion: 1.0
+SerialVersion: 1
+MinPlatformVersion: 2
+ProOnly: True
+Author: Błażej Zajączkowski
+ShortDescription: Redacts sensitive headers and parameters from HTTP requests before sharing.
+EntryPoint: RequestRedactorX.py
+BuildCommand: 
+SupportedProducts: Pro

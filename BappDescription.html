@@ -1,0 +1,22 @@
+<p>RequestRedactorX removes, censors, or masks sensitive data from HTTP requests before copying them to the clipboard. It provides four distinct copy modes and a configurable UI for managing which headers and parameters are treated as sensitive, making it easier to share request samples in reports, tickets, or team communications without leaking credentials or tokens.</p>
+
+<h2>Features</h2>
+<ul>
+  <li>Four copy modes: remove all headers, censor sensitive headers, mask sensitive parameters, or apply full combined sanitization in a single action.</li>
+  <li>Sensitive header censorship replaces values of headers such as <code class=InlineCode>Authorization</code>, <code class=InlineCode>Cookie</code>, and custom token headers with a configurable placeholder.</li>
+  <li>Parameter masking covers URL query strings, <code class=InlineCode>application/x-www-form-urlencoded</code> body parameters, and recursively traversed JSON body keys.</li>
+  <li>Customizable lists of header names and parameter names to redact or mask, each with individually configurable placeholder strings.</li>
+  <li>Optional JSON pretty-printing formats JSON request bodies for improved readability when copying sanitized output.</li>
+  <li>Context menu integration on HTTP requests across Proxy, Repeater, Intruder, and other tools.</li>
+</ul>
+
+<h2>Usage</h2>
+<ol>
+  <li>Open the RequestRedactorX tab in the extensions panel.</li>
+  <li>Add sensitive header names (e.g., <code class=InlineCode>Authorization</code>, <code class=InlineCode>Cookie</code>) to the headers list and set the desired redaction placeholder.</li>
+  <li>Add sensitive parameter names (e.g., <code class=InlineCode>password</code>, <code class=InlineCode>token</code>) to the parameters list and set the desired masking placeholder.</li>
+  <li>Toggle the JSON formatting option if you want JSON bodies to be pretty-printed in the copied output.</li>
+  <li>Right-click any HTTP request and navigate to the RequestRedactorX context menu entry.</li>
+  <li>Select one of the four copy options: headers sanitized, headers and params redacted, headers and params masked, or full sanitization combining all three.</li>
+  <li>Paste the sanitized request into reports, issue trackers, or messaging tools &rarr; sensitive values will have been replaced with the configured placeholders.</li>
+</ol>
