@@ -3,10 +3,10 @@ ExtensionType: 2
 Name: Request Redactor X
 RepoName: request-redactor-x
 ScreenVersion: 1.0
-SerialVersion: 1
+SerialVersion: 2
 MinPlatformVersion: 2
 ProOnly: True
-Author: Błażej Zajączkowski
+Author: Blazej Zajaczkowski
 ShortDescription: Redacts sensitive headers and parameters from HTTP requests before sharing.
 EntryPoint: RequestRedactorX.py
 BuildCommand: 
