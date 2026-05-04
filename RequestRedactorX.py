@@ -35,8 +35,9 @@ from javax.swing import (
     JScrollPane, BoxLayout, JMenuItem, JTabbedPane, JCheckBox
 )
 from javax.swing.border import EmptyBorder
+from javax.swing.event import DocumentListener
 
-from java.awt import BorderLayout, Dimension, FlowLayout, Toolkit
+from java.awt import BorderLayout, Dimension, FlowLayout, Toolkit, Color
 from java.awt.datatransfer import StringSelection
 
 import re
@@ -57,7 +58,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
     def registerExtenderCallbacks(self, callbacks):
         self._callbacks = callbacks
         self._helpers = callbacks.getHelpers()
-        callbacks.setExtensionName("Copy sanitized HTTP request")
+        callbacks.setExtensionName("RequestRedactorX")
 
         # ---------- Defaults ----------
 
@@ -131,7 +132,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         self._build_ui()
         callbacks.addSuiteTab(self)
 
-        print("[+] Copy Sanitized HTTP Request: loaded")
+        print("[+] RequestRedactorX: loaded")
 
     # ---------- Settings ----------
 
@@ -243,13 +244,16 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             "true" if self._pretty_json_enabled else "false"
         )
 
-        print("[+] Copy Sanitized HTTP Request: settings saved")
+        print("[+] RequestRedactorX: settings saved")
 
     # ---------- UI (ITab) ----------
 
     def _build_ui(self):
         main_panel = JPanel(BorderLayout())
         tabs = JTabbedPane()
+
+        # Status labels (one per tab; both updated together)
+        self._status_labels = []
 
         headers_tab = self._build_headers_tab()
         params_tab = self._build_params_tab()
@@ -261,6 +265,38 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         main_panel.setPreferredSize(Dimension(700, 520))
 
         self._main_panel = main_panel
+
+    def _make_status_label(self):
+        label = JLabel(" ")
+        label.setForeground(Color.GRAY)
+        self._status_labels.append(label)
+        return label
+
+    def _set_status(self, text, color):
+        for label in self._status_labels:
+            label.setText(text)
+            label.setForeground(color)
+
+    def _mark_dirty(self):
+        self._set_status(u"● Unsaved changes", Color(0xCC, 0x66, 0x00))
+
+    def _mark_saved(self):
+        self._set_status(u"✓ Settings saved", Color(0x00, 0x88, 0x00))
+
+    def _attach_dirty_listener(self, text_component):
+        ext = self
+
+        class _DirtyListener(DocumentListener):
+            def insertUpdate(self, e):
+                ext._mark_dirty()
+
+            def removeUpdate(self, e):
+                ext._mark_dirty()
+
+            def changedUpdate(self, e):
+                ext._mark_dirty()
+
+        text_component.getDocument().addDocumentListener(_DirtyListener())
 
     def _build_headers_tab(self):
         panel = JPanel()
@@ -336,10 +372,18 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
 
         panel.add(mask_panel)
 
-        # Save button
+        # Attach dirty listeners
+        self._attach_dirty_listener(self._headers_textarea)
+        self._attach_dirty_listener(self._redact_headers_textarea)
+        self._attach_dirty_listener(self._mask_headers_textarea)
+        self._attach_dirty_listener(self._redact_placeholder_field)
+        self._attach_dirty_listener(self._mask_placeholder_field)
+
+        # Save button + status label
         buttons_panel = JPanel(FlowLayout(FlowLayout.LEFT))
         btn_save = JButton("Save settings", actionPerformed=self._on_save_clicked)
         buttons_panel.add(btn_save)
+        buttons_panel.add(self._make_status_label())
         panel.add(buttons_panel)
 
         return panel
@@ -416,10 +460,20 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         json_panel.add(self._json_format_checkbox)
         panel.add(json_panel)
 
-        # Save button (same handler as headers tab)
+        # Attach dirty listeners
+        self._attach_dirty_listener(self._param_redact_textarea)
+        self._attach_dirty_listener(self._param_mask_textarea)
+        self._attach_dirty_listener(self._param_redact_placeholder_field)
+        self._attach_dirty_listener(self._param_mask_placeholder_field)
+        self._json_format_checkbox.addItemListener(
+            lambda e: self._mark_dirty()
+        )
+
+        # Save button (same handler as headers tab) + status label
         buttons_panel = JPanel(FlowLayout(FlowLayout.LEFT))
         btn_save = JButton("Save settings", actionPerformed=self._on_save_clicked)
         buttons_panel.add(btn_save)
+        buttons_panel.add(self._make_status_label())
         panel.add(buttons_panel)
 
         return panel
@@ -480,11 +534,12 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
             self._pretty_json_enabled = self._json_format_checkbox.isSelected()
 
         self._save_settings()
+        self._mark_saved()
 
     # ---------- ITab ----------
 
     def getTabCaption(self):
-        return "Copy Sanitized Request"
+        return "RequestRedactorX"
 
     def getUiComponent(self):
         return self._main_panel
