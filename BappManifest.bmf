@@ -5,9 +5,9 @@ RepoName: request-redactor-x
 ScreenVersion: 1.0
 SerialVersion: 3
 MinPlatformVersion: 2
-ProOnly: True
+ProOnly: False
 Author: Blazej Zajaczkowski
 ShortDescription: Redacts sensitive headers and parameters from HTTP requests before sharing.
 EntryPoint: RequestRedactorX.py
 BuildCommand: 
-SupportedProducts: Pro
+SupportedProducts: Pro, Community
