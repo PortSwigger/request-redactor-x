@@ -3,7 +3,7 @@ ExtensionType: 2
 Name: Request Redactor X
 RepoName: request-redactor-x
 ScreenVersion: 1.0
-SerialVersion: 2
+SerialVersion: 3
 MinPlatformVersion: 2
 ProOnly: True
 Author: Blazej Zajaczkowski
